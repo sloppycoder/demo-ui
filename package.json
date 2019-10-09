@@ -11,12 +11,14 @@
   "dependencies": {
     "@material-ui/core": "latest",
     "@material-ui/icons": "^4.4.3",
+    "can-ndjson-stream": "^1.0.2",
     "clsx": "latest",
     "react": "latest",
     "react-dom": "latest",
     "react-scripts": "latest",
     "recharts": "^1.7.1"
   },
+  "proxy": "http://localhost:3100",
   "browserslist": {
     "production": [
       ">0.2%",
