@@ -20,9 +20,18 @@ function createData(
   accountName,
   balance,
   currency,
-  lastUpdated
+  lastUpdated,
+  changed
 ) {
-  return { id, accountId, accountName, balance, currency, lastUpdated };
+  return {
+    id,
+    accountId,
+    accountName,
+    balance,
+    currency,
+    lastUpdated,
+    changed
+  };
 }
 
 export default class Accounts extends Component {
@@ -38,17 +47,29 @@ export default class Accounts extends Component {
     const payload = await response.json();
     console.log(payload);
 
+    const oldRows = this.state.rows;
+
     if (payload.hasOwnProperty("accounts")) {
       let newRows = [];
       for (var val of payload.accounts) {
         let bal = val.balances[0];
+        let changed = true;
+
+        for (var old of oldRows) {
+          //console.log(old);
+          if (old.accountId === val.account_id && old.balance === bal.amount) {
+            changed = false;
+          }
+        }
+
         let account = createData(
           val.account_id,
           val.account_id,
           val.nickname,
           bal.amount,
           val.currency,
-          bal.last_updated
+          bal.last_updated,
+          changed
         );
         newRows.push(account);
       }
@@ -85,7 +106,7 @@ export default class Accounts extends Component {
           </TableHead>
           <TableBody>
             {rows.map(row => (
-              <TableRow key={row.id} selected={row.accountId === "5201442870"}>
+              <TableRow key={row.id} selected={row.changed}>
                 <TableCell>{row.accountId}</TableCell>
                 <TableCell>{row.accountName}</TableCell>
                 <TableCell align="right">{row.balance}</TableCell>
