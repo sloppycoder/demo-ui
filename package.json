@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "PUBLIC_URL=https://ktb.myacn.net/demo1 react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
