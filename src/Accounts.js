@@ -8,7 +8,6 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import ndjsonStream from "can-ndjson-stream";
 
 import Title from "./Title";
 import { Button } from "@material-ui/core";
@@ -35,34 +34,24 @@ export default class Accounts extends Component {
 
   fetchTopAccounts = async () => {
     const response = await fetch("/api/top/10");
-    const reader = ndjsonStream(response.body).getReader();
+    const payload = await response.json();
+    console.log(payload);
 
-    let result;
-    let i = 0;
-    let rows = this.state.rows;
-
-    while (!result || !result.done) {
-      result = await reader.read();
-
-      if (result.value) {
-        let val = result.value.result;
-        console.log(val);
-        let bal = val.balances[0];
-        let account = createData(
-          i,
-          val.account_id,
-          val.nickname,
-          bal.amount,
-          val.currency,
-          bal.last_updated
-        );
-
-        rows.push(account);
-        this.setState({ rows });
-      }
-
-      i++;
+    let newRows = [];
+    for (var val of payload.accounts) {
+      let bal = val.balances[0];
+      let account = createData(
+        val.account_id,
+        val.account_id,
+        val.nickname,
+        bal.amount,
+        val.currency,
+        bal.last_updated
+      );
+      newRows.push(account);
     }
+
+    this.setState({ rows: newRows });
   };
 
   render() {
@@ -82,7 +71,7 @@ export default class Accounts extends Component {
           </TableHead>
           <TableBody>
             {rows.map(row => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} selected={row.accountId === "5201442870"}>
                 <TableCell>{row.accountId}</TableCell>
                 <TableCell>{row.accountName}</TableCell>
                 <TableCell>{row.balance}</TableCell>
