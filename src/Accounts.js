@@ -52,6 +52,19 @@ export default class Accounts extends Component {
     if (payload.hasOwnProperty("accounts")) {
       let newRows = [];
       for (var val of payload.accounts) {
+        switch (val.account_id) {
+          case "100025841135":
+            val.nickname = "K. Somkid";
+            break;
+          case "5010060280":
+            val.nickname = "Srinivasan";
+            break;
+          case "100032418035":
+            val.nickname = "Li Lin";
+            break;
+          default:
+            break;
+        }
         let bal = val.balances[0];
         let changed = true;
 
@@ -79,7 +92,7 @@ export default class Accounts extends Component {
   };
 
   componentDidMount() {
-    this.interval = setInterval(() => this.fetchTopAccounts(), 1000);
+    this.interval = setInterval(() => this.fetchTopAccounts(), 1500);
   }
 
   componentWillUnmount() {
