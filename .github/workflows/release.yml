@@ -25,7 +25,7 @@ jobs:
           tar czf demo-ui.tar.gz public/*
         env:
           CI: true
-          PUBLIC_URL: https://ktb.myacn.net/demo1
+          PUBLIC_URL: http://demo.myacn.net/ktb
 
       - name: Upload artifacts
         uses: skx/github-action-publish-binaries@master
