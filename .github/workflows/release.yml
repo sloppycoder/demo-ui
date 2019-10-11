@@ -24,7 +24,6 @@ jobs:
           npm run build
           tar czf demo-ui.tar.gz public/*
         env:
-          CI: true
           PUBLIC_URL: http://demo.myacn.net/ktb
 
       - name: Upload artifacts
