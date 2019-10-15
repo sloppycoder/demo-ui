@@ -12,22 +12,13 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Title from "./Title";
 
 // Generate Order Data
-function createData(
-  id,
-  accountId,
-  accountName,
-  balance,
-  currency,
-  lastUpdated,
-  changed
-) {
+function createData(accountId, accountName, balance, currency, changed) {
   return {
-    id,
+    id: accountId,
     accountId,
     accountName,
     balance,
     currency,
-    lastUpdated,
     changed
   };
 }
@@ -35,70 +26,57 @@ function createData(
 export default class Accounts extends Component {
   constructor(props) {
     super(props);
+    this.eventSource = new EventSource("http://localhost:3102/events/");
+
     this.state = {
-      rows: []
+      accounts: new Map()
     };
   }
 
-  fetchTopAccounts = async () => {
-    const response = await fetch("/api/top/18");
-    const payload = await response.json();
-    console.log(payload);
-
-    const oldRows = this.state.rows;
-
-    if (payload.hasOwnProperty("accounts")) {
-      let newRows = [];
-      for (var val of payload.accounts) {
-        switch (val.account_id) {
-          case "100025841135":
-            val.nickname = "K. Somkid";
-            break;
-          case "5010060280":
-            val.nickname = "Srinivasan";
-            break;
-          case "100032418035":
-            val.nickname = "Li Lin";
-            break;
-          default:
-            break;
-        }
-        let bal = val.balances[0];
-        let changed = true;
-
-        for (var old of oldRows) {
-          //console.log(old);
-          if (old.accountId === val.account_id && old.balance === bal.amount) {
-            changed = false;
-          }
-        }
-
-        let account = createData(
-          val.account_id,
-          val.account_id,
-          val.nickname,
-          bal.amount,
-          val.currency,
-          bal.last_updated,
-          changed
-        );
-        newRows.push(account);
-      }
-
-      this.setState({ rows: newRows });
+  accountUpdated = val => {
+    // hack some name into the list for demo only
+    switch (val.account_id) {
+      case "100025841135":
+        val.nickname = "K. Somkid";
+        break;
+      case "5010060280":
+        val.nickname = "Srinivasan";
+        break;
+      case "100032418035":
+        val.nickname = "Li Lin";
+        break;
+      default:
+        break;
     }
+
+    let newAccounts = new Map(this.state.accounts);
+
+    let acc = createData(
+      val.account_id,
+      val.nickname,
+      val.balances[0].amount,
+      val.currency,
+      true
+    );
+
+    newAccounts.set(val.account_id, acc);
+
+    this.setState({ accounts: newAccounts });
   };
 
   componentDidMount() {
-    this.interval = setInterval(() => this.fetchTopAccounts(), 1500);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
+    this.eventSource.onmessage = e => {
+      if (e.data !== "{}") {
+        this.accountUpdated(JSON.parse(e.data));
+      }
+    };
   }
 
   render() {
-    let rows = this.state.rows;
+    let accounts = this.state.accounts;
+    let rows = [];
+    accounts.forEach(acc => rows.push(acc));
+
     return (
       <Container>
         <Title>Recent Updated Accounts</Title>
@@ -112,17 +90,15 @@ export default class Accounts extends Component {
               <TableCell>Account Name</TableCell>
               <TableCell align="right">Balance</TableCell>
               <TableCell>Currency</TableCell>
-              <TableCell align="right">Last Updated</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(row => (
-              <TableRow key={row.id} selected={row.changed}>
-                <TableCell>{row.accountId}</TableCell>
-                <TableCell>{row.accountName}</TableCell>
-                <TableCell align="right">{row.balance}</TableCell>
-                <TableCell>{row.currency}</TableCell>
-                <TableCell align="right">{row.lastUpdated}</TableCell>
+            {rows.map(acc => (
+              <TableRow key={acc.accountId}>
+                <TableCell>{acc.accountId}</TableCell>
+                <TableCell>{acc.accountName}</TableCell>
+                <TableCell align="right">{acc.balance}</TableCell>
+                <TableCell>{acc.currency}</TableCell>
               </TableRow>
             ))}
           </TableBody>
