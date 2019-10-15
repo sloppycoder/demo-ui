@@ -26,7 +26,7 @@ function createData(accountId, accountName, balance, currency, changed) {
 export default class Accounts extends Component {
   constructor(props) {
     super(props);
-    this.eventSource = new EventSource("http://localhost:3102/events/");
+    this.eventSource = new EventSource("/events/");
 
     this.state = {
       accounts: new Map()
