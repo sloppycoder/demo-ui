@@ -24,8 +24,8 @@ jobs:
           npm run build
           tar czf demo-ui.tar.gz build/*
         env:
-          CU: true 
-          PUBLIC_URL: http://demo.myacn.net/ktb
+          CU: true
+          PUBLIC_URL: https://ktb.myacn.net/demo1
 
       - name: Upload artifacts
         uses: skx/github-action-publish-binaries@master
