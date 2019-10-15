@@ -12,14 +12,13 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Title from "./Title";
 
 // Generate Order Data
-function createData(accountId, accountName, balance, currency, changed) {
+function createData(accountId, accountName, ledgerBalance, currency) {
   return {
     id: accountId,
     accountId,
     accountName,
-    balance,
-    currency,
-    changed
+    ledgerBalance,
+    currency
   };
 }
 
@@ -27,39 +26,17 @@ export default class Accounts extends Component {
   constructor(props) {
     super(props);
     this.eventSource = new EventSource("/events/");
-
     this.state = {
       accounts: new Map()
     };
   }
 
   accountUpdated = val => {
-    // hack some name into the list for demo only
-    switch (val.account_id) {
-      case "100025841135":
-        val.nickname = "K. Somkid";
-        break;
-      case "5010060280":
-        val.nickname = "Srinivasan";
-        break;
-      case "100032418035":
-        val.nickname = "Li Lin";
-        break;
-      default:
-        break;
-    }
-
     let newAccounts = new Map(this.state.accounts);
-
-    let acc = createData(
-      val.account_id,
-      val.nickname,
-      val.balances[0].amount,
-      val.currency,
-      true
+    newAccounts.set(
+      val.accountId,
+      createData(val.accountId, val.nickname, val.ledgerBalance, val.currency)
     );
-
-    newAccounts.set(val.account_id, acc);
 
     this.setState({ accounts: newAccounts });
   };
@@ -97,7 +74,7 @@ export default class Accounts extends Component {
               <TableRow key={acc.accountId}>
                 <TableCell>{acc.accountId}</TableCell>
                 <TableCell>{acc.accountName}</TableCell>
-                <TableCell align="right">{acc.balance}</TableCell>
+                <TableCell align="right">{acc.ledgerBalance}</TableCell>
                 <TableCell>{acc.currency}</TableCell>
               </TableRow>
             ))}
