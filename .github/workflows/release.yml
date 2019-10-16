@@ -22,7 +22,7 @@ jobs:
         run: |
           npm install
           npm run build
-          tar czf demo-ui.tar.gz build/*
+          tar czf demo-ui.tar.gz -C build .
         env:
           CU: true
           PUBLIC_URL: https://ktb.myacn.net/demo1
