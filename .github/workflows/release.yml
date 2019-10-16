@@ -22,7 +22,8 @@ jobs:
         run: |
           npm install
           npm run build
-          tar czf demo-ui.tar.gz -C build .
+          cd build
+          tar czf demo-ui.tar.gz *
         env:
           CU: true
           PUBLIC_URL: https://ktb.myacn.net/demo1
@@ -32,4 +33,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: "demo-ui.tar.gz"
+          args: "build/demo-ui.tar.gz"
